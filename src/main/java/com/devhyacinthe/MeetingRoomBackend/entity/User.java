@@ -23,6 +23,10 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+
+    public User() {}
+
+
     public Long getId() {
         return id;
     }

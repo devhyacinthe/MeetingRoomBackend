@@ -31,10 +31,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // ADMIN : gestion complète des salles
-                        .requestMatchers("/api/rooms/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/api/admin/rooms/**").hasRole(Role.ADMIN.name())
+
+                        .requestMatchers("/api/rooms/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
 
                         // UTILISATEUR et ADMIN: consulter les salles et créer des réservations
-                        .requestMatchers("/api/reservations/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
+                        .requestMatchers("/api/reservations/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
 
                         // tout le reste nécessite authentification
                         .anyRequest().authenticated()

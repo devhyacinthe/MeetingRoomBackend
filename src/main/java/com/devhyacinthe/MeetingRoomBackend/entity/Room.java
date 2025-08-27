@@ -2,7 +2,7 @@ package com.devhyacinthe.MeetingRoomBackend.entity;
 
 import com.devhyacinthe.MeetingRoomBackend.enums.RoomStatus;
 import jakarta.persistence.*;
-import lombok.Data;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,11 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
-    private int capacity;
+    @Column(nullable = false)
+    private Integer capacity;
 
     @ElementCollection
     @CollectionTable(name = "room_equipments", joinColumns = @JoinColumn(name = "room_id"))
@@ -26,7 +28,18 @@ public class Room {
     private String location;
 
     @Enumerated(EnumType.STRING)
-    private RoomStatus status;
+    @Column(nullable = false)
+    private RoomStatus status = RoomStatus.FREE;
+
+    public Room(String name, int capacity, List<String> equipments, String location, RoomStatus status) {
+        this.name = name;
+        this.capacity = capacity;
+        this.equipments = equipments;
+        this.location = location;
+        this.status = status;
+    }
+
+    public Room() {}
 
     public Long getId() {
         return id;

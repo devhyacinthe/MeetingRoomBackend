@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MeetingRoomBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MeetingRoomBackendApplication.class, args);
+
+        SpringApplication.run(MeetingRoomBackendApplication.class, args);
+
 	}
 
 }

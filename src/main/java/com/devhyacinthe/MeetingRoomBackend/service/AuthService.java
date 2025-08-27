@@ -41,6 +41,9 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ConflictException("Email ou mot de passe incorrect");
         }
-        return jwtUtils.generateToken(user.getEmail());
+
+        String token = jwtUtils.generateToken(user.getEmail());
+        System.out.println("🔑 TOKEN GENERE = " + token);
+        return token;
     }
 }

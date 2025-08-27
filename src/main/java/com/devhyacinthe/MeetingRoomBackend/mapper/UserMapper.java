@@ -11,7 +11,6 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    AuthRequest toAuthRequestDTO(User user);
     User toEntity(AuthRequest dto);
 
     RegisterResponse toRegisterResponseDTO(User user);
