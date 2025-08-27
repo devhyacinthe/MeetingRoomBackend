@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN"
+        "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReservationReport"
+              pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="12345678-1234-1234-1234-1234567890ab">
+
+    <!-- 🟢 Paramètres globaux -->
+    <parameter name="REPORT_TITLE" class="java.lang.String"/>
+
+    <!-- 🟢 Champs récupérés depuis ta query SQL ou datasource -->
+    <field name="salleNom" class="java.lang.String"/>
+    <field name="utilisateurNom" class="java.lang.String"/>
+    <field name="dateReservation" class="java.util.Date"/>
+    <field name="heureDebut" class="java.sql.Time"/>
+    <field name="heureFin" class="java.sql.Time"/>
+    <field name="statut" class="java.lang.String"/>
+
+    <!-- 🟢 En-tête du rapport -->
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" uuid="title-1"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[$P{REPORT_TITLE}]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- 🟢 En-tête de colonnes -->
+    <columnHeader>
+        <band height="25">
+            <staticText>
+                <reportElement x="0" y="0" width="100" height="25" uuid="col-1"/>
+                <text><![CDATA[Salle]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="0" width="120" height="25" uuid="col-2"/>
+                <text><![CDATA[Utilisateur]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="220" y="0" width="100" height="25" uuid="col-3"/>
+                <text><![CDATA[Date]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="320" y="0" width="80" height="25" uuid="col-4"/>
+                <text><![CDATA[Début]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="400" y="0" width="80" height="25" uuid="col-5"/>
+                <text><![CDATA[Fin]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="480" y="0" width="75" height="25" uuid="col-6"/>
+                <text><![CDATA[Statut]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- 🟢 Détails (lignes de données) -->
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="100" height="20" uuid="det-1"/>
+                <textFieldExpression><![CDATA[$F{salleNom}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="100" y="0" width="120" height="20" uuid="det-2"/>
+                <textFieldExpression><![CDATA[$F{utilisateurNom}]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy">
+                <reportElement x="220" y="0" width="100" height="20" uuid="det-3"/>
+                <textFieldExpression><![CDATA[$F{dateReservation}]]></textFieldExpression>
+            </textField>
+            <textField pattern="HH:mm">
+                <reportElement x="320" y="0" width="80" height="20" uuid="det-4"/>
+                <textFieldExpression><![CDATA[$F{heureDebut}]]></textFieldExpression>
+            </textField>
+            <textField pattern="HH:mm">
+                <reportElement x="400" y="0" width="80" height="20" uuid="det-5"/>
+                <textFieldExpression><![CDATA[$F{heureFin}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="480" y="0" width="75" height="20" uuid="det-6"/>
+                <textFieldExpression><![CDATA[$F{statut}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- 🟢 Pied de page -->
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="20" uuid="footer-1"/>
+                <textElement textAlignment="Center"/>
+                <text><![CDATA[Rapport généré automatiquement par le système de réservation de salles]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>
