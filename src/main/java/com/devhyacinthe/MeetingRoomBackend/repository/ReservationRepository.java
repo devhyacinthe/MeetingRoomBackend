@@ -21,4 +21,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                   @Param("dateReservation") LocalDate dateReservation,
                                                   @Param("startTime") LocalTime startTime,
                                                   @Param("endTime") LocalTime endTime);
+
+    // Toutes les réservations pour une salle spécifique
+    List<Reservation> findByRoomId(Long roomId);
+
+    // Toutes les réservations pour un jour donné
+    List<Reservation> findByDateReservation(LocalDate dateReservation);
+
+    // Toutes les réservations pour une salle à une date donnée
+    List<Reservation> findByRoomIdAndDateReservation(Long roomId, LocalDate dateReservation);
 }

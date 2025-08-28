@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.jasperreports.engine.JRException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -57,10 +59,16 @@ public class ReservationController {
         return reservationService.cancelReservationById(id);
     }
 
+    /**
+     * Génère un PDF des réservations
+     * @param roomId optionnel : filtrer par salle
+     * @param dateReservation optionnel : filtrer par date (format yyyy-MM-dd)
+     */
     @GetMapping("/admin/reservations/export/pdf")
     @Operation(summary = "Exporter les réservations en PDF")
-    public String generateReport() throws JRException {
-        return reportService.generateReservationReport();
+    public String generateReport(@RequestParam(required = false) Long roomId,
+                                 @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dateReservation) throws JRException {
+        return reportService.generateReservationReport(roomId, dateReservation);
     }
 
 }

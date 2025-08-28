@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +23,20 @@ public class ReportService {
         this.reservationRepository = reservationRepository;
     }
 
-    public String generateReservationReport() throws JRException {
-        // 1️⃣ Récupérer toutes les réservations
-        List<Reservation> reservations = reservationRepository.findAll();
+    public String generateReservationReport(Long roomId, LocalDate dateReservation) throws JRException {
+
+        // 1️⃣ Récupérer les réservations filtrées
+        List<Reservation> reservations;
+
+        if (roomId != null && dateReservation != null) {
+            reservations = reservationRepository.findByRoomIdAndDateReservation(roomId, dateReservation);
+        } else if (roomId != null) {
+            reservations = reservationRepository.findByRoomId(roomId);
+        } else if (dateReservation != null) {
+            reservations = reservationRepository.findByDateReservation(dateReservation);
+        } else {
+            reservations = reservationRepository.findAll();
+        }
 
         // 2️⃣ Transformer en DTO pour JasperReports
         List<ReservationReportDTO> reservationDTOs = reservations.stream()
