@@ -1,12 +1,11 @@
 package com.devhyacinthe.MeetingRoomBackend.service;
 
-import com.devhyacinthe.MeetingRoomBackend.dto.GetReservationDTO;
-import com.devhyacinthe.MeetingRoomBackend.dto.ReservationDTO;
-import com.devhyacinthe.MeetingRoomBackend.dto.UpdateReservationStatusDTO;
+import com.devhyacinthe.MeetingRoomBackend.dto.*;
 import com.devhyacinthe.MeetingRoomBackend.entity.Reservation;
 import com.devhyacinthe.MeetingRoomBackend.entity.Room;
 import com.devhyacinthe.MeetingRoomBackend.entity.User;
 import com.devhyacinthe.MeetingRoomBackend.enums.ReservationStatus;
+import com.devhyacinthe.MeetingRoomBackend.enums.RoomStatus;
 import com.devhyacinthe.MeetingRoomBackend.exception.ConflictException;
 import com.devhyacinthe.MeetingRoomBackend.exception.NotFoundException;
 import com.devhyacinthe.MeetingRoomBackend.mapper.ReservationMapper;
@@ -16,26 +15,31 @@ import com.devhyacinthe.MeetingRoomBackend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ReservationService {
 
-    private ReservationRepository reservationRepo;
-    private ReservationMapper reservationMapper;
-    private UserService userService;
-    private MailService mailService;
-    private RoomRepository roomRepo;
-    private UserRepository userRepo;
+    private final ReservationRepository reservationRepo;
+    private final ReservationMapper reservationMapper;
+    private final UserService userService;
+    private final MailService mailService;
+    private final RoomRepository roomRepo;
+    private final UserRepository userRepo;
+    private final NotificationService notificationService;
 
-    public ReservationService(ReservationRepository reservationRepo, ReservationMapper reservationMapper, UserService userService, MailService mailService, UserRepository userRepo, RoomRepository roomRepo){
+    public ReservationService(ReservationRepository reservationRepo, ReservationMapper reservationMapper, UserService userService, MailService mailService, UserRepository userRepo, RoomRepository roomRepo, NotificationService notificationService){
         this.reservationRepo = reservationRepo;
         this.reservationMapper = reservationMapper;
         this.userService = userService;
         this.mailService = mailService;
         this.userRepo = userRepo;
         this.roomRepo = roomRepo;
+        this.notificationService = notificationService;
     }
 
 
@@ -94,6 +98,17 @@ public class ReservationService {
         Reservation reservation = reservationRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation introuvable avec id: " + id));
         reservationMapper.updateReservationStatusFromDto(ReservationStatus.CONFIRMED, reservation);
+
+        // envoi notification
+        ReservationNotificationDTO dto = new ReservationNotificationDTO(
+                reservation.getRoom().getId(),
+                RoomStatus.BUSY,
+                reservation.getId(),
+                reservation.getDateReservation().atTime(reservation.getStartTime()),
+                reservation.getDateReservation().atTime(reservation.getEndTime())
+        );
+        notificationService.notifyRoomChange(dto);
+
         /*mailService.sendReservationEmail(
                 reservation.getUser().getEmail(),
                 "✅ Confirmation de réservation",
@@ -106,6 +121,18 @@ public class ReservationService {
         Reservation reservation = reservationRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation introuvable avec id: " + id));
         reservationMapper.updateReservationStatusFromDto(ReservationStatus.CANCELLED, reservation);
+
+        // envoi notification
+        ReservationNotificationDTO dto = new ReservationNotificationDTO(
+                reservation.getRoom().getId(),
+                RoomStatus.FREE,
+                reservation.getId(),
+                reservation.getDateReservation().atTime(reservation.getStartTime()),
+                reservation.getDateReservation().atTime(reservation.getEndTime())
+        );
+        notificationService.notifyRoomChange(dto);
+
+
         /*mailService.sendReservationEmail(
                 reservation.getUser().getEmail(),
                 "❌ Annulation de votre réservation",
@@ -125,6 +152,56 @@ public class ReservationService {
             sb.append(ALPHANUM.charAt(index));
         }
         return sb.toString();
+    }
+
+    private List<Reservation> findByRoomAndWeek(Long roomId, int week, int year) {
+        LocalDate firstDayOfWeek = LocalDate.ofYearDay(year, 1)
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week)
+                .with(DayOfWeek.MONDAY);
+
+        LocalDate lastDayOfWeek = firstDayOfWeek.plusDays(6);
+
+        return reservationRepo.findByRoomAndDateBetween(roomId, firstDayOfWeek, lastDayOfWeek);
+    }
+
+    public List<CalendarEventDTO> getReservationsAsCalendar(Long roomId, LocalDate dateReservation) {
+        List<Reservation> reservations = reservationRepo.findByRoomIdAndDateReservation(roomId, dateReservation);
+
+        return reservations.stream().map(r -> {
+            String color = switch (r.getStatus()) {
+                case PENDING -> "#f6c23e"; // jaune
+                case CONFIRMED -> "#1cc88a"; // vert
+                case CANCELLED -> "#e74a3b";   // rouge
+                default -> "#36b9cc";          // bleu par défaut
+            };
+
+            return new CalendarEventDTO(
+                    "Salle " + r.getRoom().getName() + " - " + r.getUser().getUsername(),
+                    r.getDateReservation().atTime(r.getStartTime()).toString(),
+                    r.getDateReservation().atTime(r.getEndTime()).toString(),
+                    color
+            );
+        }).toList();
+    }
+
+    public List<CalendarEventDTO> getReservationsForWeek(Long roomId, int week, int year) {
+        List<Reservation> reservations = findByRoomAndWeek(roomId, week, year);
+
+        return reservations.stream().map(r -> {
+            String color = switch (r.getStatus()) {
+                case PENDING -> "#f6c23e";
+                case CONFIRMED -> "#1cc88a";
+                case CANCELLED -> "#e74a3b";
+                default -> "#36b9cc";
+            };
+
+            return new CalendarEventDTO(
+                    "Salle " + r.getRoom().getName() + " - " + r.getUser().getUsername(),
+                    r.getDateReservation().atTime(r.getStartTime()).toString(),
+                    r.getDateReservation().atTime(r.getEndTime()).toString(),
+                    color
+            );
+        }).toList();
     }
 
 }

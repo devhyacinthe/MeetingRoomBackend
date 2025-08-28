@@ -30,4 +30,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     // Toutes les réservations pour une salle à une date donnée
     List<Reservation> findByRoomIdAndDateReservation(Long roomId, LocalDate dateReservation);
+
+    @Query("SELECT r FROM Reservation r WHERE r.room.id = :roomId AND r.dateReservation BETWEEN :start AND :end")
+    List<Reservation> findByRoomAndDateBetween(
+            @Param("roomId") Long roomId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }
