@@ -1,42 +1,66 @@
 package com.devhyacinthe.MeetingRoomBackend.controller;
 
+import com.devhyacinthe.MeetingRoomBackend.dto.GetReservationDTO;
+import com.devhyacinthe.MeetingRoomBackend.dto.ReservationDTO;
+import com.devhyacinthe.MeetingRoomBackend.entity.Reservation;
+import com.devhyacinthe.MeetingRoomBackend.service.ReportService;
+import com.devhyacinthe.MeetingRoomBackend.service.ReservationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import net.sf.jasperreports.engine.JRException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Tag(name = "Réservations")
-@RequestMapping("/api/reservations")
+@RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
 public class ReservationController {
 
+    private final ReservationService reservationService;
+    private final ReportService reportService;
+
+    public ReservationController(ReservationService reservationService, ReportService reportService) {
+        this.reservationService = reservationService;
+        this.reportService = reportService;
+    }
+
+    @PostMapping("/reservations")
+    @Operation(summary = "Créer une réservation (UTILISATEUR)")
+    public Reservation createReservation(@RequestBody ReservationDTO request) {
+        return reservationService.createReservation(request);
+    }
+
+    @GetMapping("/reservations")
+    @Operation(summary = "Voir mes réservations (UTILISATEUR)")
+    public List<GetReservationDTO> getAllUserReservations() {
+        return reservationService.getAllUserReservations();
+    }
+
+    @GetMapping("/admin/reservations")
+    @Operation(summary = "Voir toutes les réservations (ADMIN)")
+    public List<GetReservationDTO> getAllReservations() {
+        return reservationService.getAllReservations();
+    }
+
+    @PatchMapping("/admin/reservations/{id}/confirmer")
+    @Operation(summary = "Confirmer une réservation (ADMIN)")
+    public Reservation confirmReservationById(@PathVariable Long id)  {
+        return reservationService.confirmReservationById(id);
+    }
+
+    @PatchMapping("/admin/reservations/{id}/annuler")
+    @Operation(summary = "Annuler une réservation (ADMIN)")
+    public Reservation cancelReservationById(@PathVariable Long id)  {
+        return reservationService.cancelReservationById(id);
+    }
+
+    @GetMapping("/admin/reservations/export/pdf")
+    @Operation(summary = "Exporter les réservations en PDF")
+    public String generateReport() throws JRException {
+        return reportService.generateReservationReport();
+    }
+
 }
-
-
-//POST /reservations → créer une réservation (UTILISATEUR)
-
-//GET /reservations → voir mes réservations (UTILISATEUR)
-
-//GET /admin/reservations → voir toutes les réservations (ADMIN)
-
-//PUT /admin/reservations/{id}/confirmer → confirmer une réservation (ADMIN)
-
-//PUT /admin/reservations/{id}/annuler → annuler une réservation (ADMIN)
-
-//GET /admin/reservations/export/pdf → exporter les réservations en PDF
-
-/*
-Quand un utilisateur tente de réserver une salle :
-
-Vérifier si la salle est déjà réservée à la même date et pour une plage horaire qui chevauche celle demandée.
-
-Si oui → rejeter la réservation avec un message clair.
-
-        Sinon → sauvegarder en EN_ATTENTE.
-
-
-Lorsqu’une réservation est confirmée → envoi d’un email à l’utilisateur :
-        "Votre réservation de la salle X le JJ/MM/AAAA de HH:MM à HH:MM est confirmée."
-
-Lorsqu’une réservation est annulée → autre email avec le motif. */

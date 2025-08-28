@@ -15,18 +15,18 @@
     <parameter name="REPORT_TITLE" class="java.lang.String"/>
 
     <!-- 🟢 Champs récupérés depuis ta query SQL ou datasource -->
-    <field name="salleNom" class="java.lang.String"/>
-    <field name="utilisateurNom" class="java.lang.String"/>
-    <field name="dateReservation" class="java.util.Date"/>
-    <field name="heureDebut" class="java.sql.Time"/>
-    <field name="heureFin" class="java.sql.Time"/>
-    <field name="statut" class="java.lang.String"/>
+    <field name="roomName" class="java.lang.String"/>
+    <field name="userName" class="java.lang.String"/>
+    <field name="dateReservation" class="java.time.LocalDate"/>
+    <field name="startTime" class="java.time.LocalTime"/>
+    <field name="endTime" class="java.time.LocalTime"/>
+    <field name="status" class="com.devhyacinthe.MeetingRoomBackend.enums.ReservationStatus"/>
 
     <!-- 🟢 En-tête du rapport -->
     <title>
         <band height="60">
             <staticText>
-                <reportElement x="0" y="10" width="555" height="30" uuid="title-1"/>
+                <reportElement x="0" y="10" width="555" height="30"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="16" isBold="true"/>
                 </textElement>
@@ -39,27 +39,27 @@
     <columnHeader>
         <band height="25">
             <staticText>
-                <reportElement x="0" y="0" width="100" height="25" uuid="col-1"/>
+                <reportElement x="0" y="0" width="100" height="25"/>
                 <text><![CDATA[Salle]]></text>
             </staticText>
             <staticText>
-                <reportElement x="100" y="0" width="120" height="25" uuid="col-2"/>
+                <reportElement x="100" y="0" width="120" height="25"/>
                 <text><![CDATA[Utilisateur]]></text>
             </staticText>
             <staticText>
-                <reportElement x="220" y="0" width="100" height="25" uuid="col-3"/>
+                <reportElement x="220" y="0" width="100" height="25"/>
                 <text><![CDATA[Date]]></text>
             </staticText>
             <staticText>
-                <reportElement x="320" y="0" width="80" height="25" uuid="col-4"/>
+                <reportElement x="320" y="0" width="80" height="25"/>
                 <text><![CDATA[Début]]></text>
             </staticText>
             <staticText>
-                <reportElement x="400" y="0" width="80" height="25" uuid="col-5"/>
+                <reportElement x="400" y="0" width="80" height="25"/>
                 <text><![CDATA[Fin]]></text>
             </staticText>
             <staticText>
-                <reportElement x="480" y="0" width="75" height="25" uuid="col-6"/>
+                <reportElement x="480" y="0" width="75" height="25"/>
                 <text><![CDATA[Statut]]></text>
             </staticText>
         </band>
@@ -69,28 +69,28 @@
     <detail>
         <band height="20">
             <textField>
-                <reportElement x="0" y="0" width="100" height="20" uuid="det-1"/>
-                <textFieldExpression><![CDATA[$F{salleNom}]]></textFieldExpression>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[$F{roomName}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="100" y="0" width="120" height="20" uuid="det-2"/>
-                <textFieldExpression><![CDATA[$F{utilisateurNom}]]></textFieldExpression>
+                <reportElement x="100" y="0" width="120" height="20"/>
+                <textFieldExpression><![CDATA[$F{userName}]]></textFieldExpression>
             </textField>
             <textField pattern="dd/MM/yyyy">
-                <reportElement x="220" y="0" width="100" height="20" uuid="det-3"/>
+                <reportElement x="220" y="0" width="100" height="20"/>
                 <textFieldExpression><![CDATA[$F{dateReservation}]]></textFieldExpression>
             </textField>
             <textField pattern="HH:mm">
-                <reportElement x="320" y="0" width="80" height="20" uuid="det-4"/>
-                <textFieldExpression><![CDATA[$F{heureDebut}]]></textFieldExpression>
+                <reportElement x="320" y="0" width="80" height="20"/>
+                <textFieldExpression><![CDATA[$F{startTime}]]></textFieldExpression>
             </textField>
             <textField pattern="HH:mm">
-                <reportElement x="400" y="0" width="80" height="20" uuid="det-5"/>
-                <textFieldExpression><![CDATA[$F{heureFin}]]></textFieldExpression>
+                <reportElement x="400" y="0" width="80" height="20" />
+                <textFieldExpression><![CDATA[$F{endTime}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="480" y="0" width="75" height="20" uuid="det-6"/>
-                <textFieldExpression><![CDATA[$F{statut}]]></textFieldExpression>
+                <reportElement x="480" y="0" width="75" height="20"/>
+                <textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
             </textField>
         </band>
     </detail>
@@ -99,7 +99,7 @@
     <pageFooter>
         <band height="20">
             <staticText>
-                <reportElement x="0" y="0" width="555" height="20" uuid="footer-1"/>
+                <reportElement x="0" y="0" width="555" height="20"/>
                 <textElement textAlignment="Center"/>
                 <text><![CDATA[Rapport généré automatiquement par le système de réservation de salles]]></text>
             </staticText>

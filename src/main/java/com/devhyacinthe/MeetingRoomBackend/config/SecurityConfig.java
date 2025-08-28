@@ -38,6 +38,8 @@ public class SecurityConfig {
                         // UTILISATEUR et ADMIN: consulter les salles et créer des réservations
                         .requestMatchers("/api/reservations/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
 
+                        .requestMatchers("/api/admin/reservations/**").hasRole(Role.ADMIN.name())
+
                         // tout le reste nécessite authentification
                         .anyRequest().authenticated()
                 )
